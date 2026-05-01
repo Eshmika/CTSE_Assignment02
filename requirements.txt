@@ -1,11 +1,9 @@
-"""
-Requirements file for AI Travel Planner Multi-Agent System
-
-This project requires:
-- Python 3.8+
-- Ollama (local LLM engine) with llama3:8b model
-- Python packages listed below
-"""
+# Requirements file for AI Travel Planner Multi-Agent System
+#
+# This project requires:
+# - Python 3.8+
+# - Ollama (local LLM engine) with llama3:8b model
+# - Python packages listed below
 
 # Web UI Framework
 streamlit>=1.28.0
