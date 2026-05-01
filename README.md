@@ -12,40 +12,49 @@ This project implements an AI-powered travel planner that combines multiple spec
 - **Intelligent Recommendation**: Provides personalized suggestions based on destination, duration, and budget
 - **Cost Optimization**: Calculates travel expenses with detailed breakdowns (accommodation, food, transport, activities)
 - **Comprehensive Validation**: Ensures plans are realistic, budget-compliant, and structurally sound
-- **Flexible Execution Modes**:
-  - **Cloud Mode**: Uses Ollama for powerful AI-generated content
-  - **Local Mode**: Runs with mock data for offline use
 - **Extensive Testing**: Complete test suite with unit tests, property-based tests, and integration tests
 
 ## 🛠️ Technical Stack
 
 - **Language**: Python 3.10+
 - **Testing**: `pytest`, `pytest-cov`, `hypothesis`
-- **Development**: `ruff`, `black`, `pre-commit`
-- **AI**: Ollama (optional)
-- **Structure**: Multi-agent system with shared tools and memory
+- **AI**: Ollama (local LLM engine)
+- ~8GB RAM minimum
 
 ## 📂 Project Structure
 
 ```
 EcoTourAI/
-├── agents/              # AI agent implementations
-│   ├── planner.py       # Travel planner agent
-│   ├── researcher.py    # Location research agent
-│   ├── estimator.py     # Budget estimator agent
-│   ├── validator.py     # Plan validator agent
-│   └── base_agent.py    # Abstract base agent with memory
-├── tools/               # Reusable tools and utilities
-│   ├── location_data_tool.py
-│   ├── cost_calculator_tool.py
-│   ├── validation_tool.py
-│   ├── file_saver_tool.py
-│   └── helper_tools.py
-├── main.py              # Main entry point and MAS orchestration
-├── tests/               # Comprehensive test suite
-│   └── test_*.py
-├── .gitignore           # Version control ignore rules
-└── README.md            # Project documentation
+├── agents/                          # 4 Agent implementations
+│   ├── planner.py                   # Travel Planner Agent (Student 1)
+│   ├── researcher.py                # Location Researcher Agent (Student 2)
+│   ├── estimator.py                 # Budget Estimator Agent (Student 3)
+│   └── validator.py                 # Plan Validator Agent (Student 4)
+│
+├── tools/                           # 4 Custom tools that agents use
+│   ├── cost_calculator_tool.py      # Cost calculations (Student 1)
+│   ├── location_data_tool.py        # Destination data (Student 2)
+│   ├── validation_tool.py           # Plan validation (Student 3)
+│   └── file_saver_tool.py           # File I/O operations (Student 4)
+│
+├── tests/                           # Comprehensive test suite
+│   └── test_tools.py                # 36+ unit and integration tests
+│
+├── logs/                            # Execution logs
+│   └── log.txt                      # Timestamped activity logs
+│
+├── main.py                          # CLI orchestrator
+├── app.py                           # Streamlit web UI
+├── ollama_client.py                 # Ollama LLM client 
+├── setup_check.py                   # Setup verification 
+│
+├── requirements.txt                 # Python dependencies
+├── README.md                        # This file
+├── OLLAMA_SETUP.txt                 # Detailed Ollama setup guide 
+├── COVERAGE_ANALYSIS.txt            # Requirements compliance audit 
+│
+├── output.txt                       # Generated travel plans
+└── PROJECT_SUMMARY.md               # Project overview
 ```
 
 ## 📋 Setup
@@ -53,46 +62,101 @@ EcoTourAI/
 ### Prerequisites
 
 - Python 3.10 or higher
-- [Ollama](https://ollama.com/) (optional, for cloud mode)
+- [Ollama](https://ollama.com/)
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
-   cd EcoTourAI
    ```
 
 2. **Create virtual environment**
+
    ```bash
    python -m venv .venv
    source .venv/bin/activate  # Windows
    # source .venv/bin/activate  # Linux/Mac
    ```
 
+3. **Install Ollama (https://ollama.ai)**
+
+  ```bash
+   ollama pull llama3:8b
+  ```
+
 3. **Install dependencies**
-   ```bash
+
+  ```bash
    pip install -r requirements.txt
-   ```
+  ```
+
+4. **Verify setup**
+
+  ```bash
+   python setup_check.py
+  ```
 
 ## 🏃 Usage
 
 ### Running the Travel Planner
 
 ```bash
-# Terminal 1 - Start Ollama
+# Terminal 1: Start Ollama server
 ollama serve
 
-# Terminal 2 - Run web interface
-python -m streamlit run app.py
+# Terminal 2: Run CLI or Web UI
+python main.py                    # CLI mode
+# OR
+python -m streamlit run app.py    # Web UI mode
 ```
 
-### Available Options
+## 🤖 System Architecture
 
-- **--destination** (required): Travel destination (e.g., "Ella", "Kandy")
-- **--days** (required): Number of days for the trip
-- **--budget** (optional): User's budget (LKR)
-- **--accommodation** (optional): `budget`, `mid-range`, or `luxury`
+### Multi-Agent Pipeline
+
+```
+User Input (Destination, Days, Budget)
+    ↓
+[Agent 1] Travel Planner
+    ↓ (Itinerary)
+[Agent 2] Location Researcher  
+    ↓ (Enhanced Plan)
+[Agent 3] Budget Estimator
+    ↓ (Cost Analysis)
+[Agent 4] Plan Validator
+    ↓ (Validation Result)
+Final Travel Plan (Saved to output.txt)
+```
+
+### Components
+
+**AGENTS (4)** - Each agent handles a specific role:
+- `TravelPlannerAgent` - Creates day-by-day itineraries using Ollama LLM
+- `LocationResearchAgent` - Enhances plans with destination insights
+- `BudgetEstimatorAgent` - Calculates comprehensive travel costs
+- `PlanValidatorAgent` - Validates and scores final plans
+
+**TOOLS (4)** - Custom Python functions that agents use:
+- `cost_calculator_tool` - Budget calculations with breakdown
+- `location_data_tool` - Static travel data for 4 destinations  
+- `validation_tool` - Quality scoring algorithm
+- `file_saver_tool` - Output generation and logging
+
+**LLM INTEGRATION** - Ollama powered reasoning:
+- `ollama_client.py` - HTTP REST client for llama3:8b
+- Smart prompt engineering for each agent
+- Fallback to mock data if Ollama unavailable
+- Temperature and token configuration
+
+**ORCHESTRATOR** - TravelPlannerMAS class:
+- Sequences agents in correct order
+- Passes context between agents
+- Manages logging and observability
+- Handles errors gracefully
+
+---
 
 ## 🧪 Testing
 
@@ -112,29 +176,23 @@ pytest tests/ --cov=tools --cov=agents
 # Run with verbose output
 pytest tests/ -v
 
-# Run with detailed coverage report
-pytest tests/ --cov=tools --cov=agents --cov-report=term
 ```
 
-### Specific Test Categories
+### Test Categories Included
 
-```bash
-# Unit tests
-pytest tests/test_tools.py -v
+- Cost Calculator Tests (10)
+- Location Data Tests (6)
+- Validation Tests (4)
+- File Operation Tests (6)
+- Agent Tests (4)
+- Integration Tests (1)
+- Property-Based Tests (5)
 
-# Agent tests
-pytest tests/test_agents.py -v
+**Total**: 36+ comprehensive test cases
 
-# Property-based tests
-pytest tests/test_property_based.py -v
-
-# Integration tests
-pytest tests/test_integration.py -v
-```
+---
 
 ## 📋 Sample Output
-
-### Cloud Mode Output
 
 ```text
 Travel Plan for Ella (3 days, mid-range)
@@ -172,40 +230,5 @@ Budget Check:
   - Total Cost: LKR 17,000
   - Budget: LKR 25,000
   - Status: Within budget (LKR 8,000 remaining)
-```
-
-### Local Mode Output
-
-```text
-[LOCAL MODE] Travel Plan for Kandy (2 days, mid-range)
-================================================
-
-PLAN SUMMARY:
-
-Day 1: Arrival in Kandy & Temple Visit
-  - Morning: Arrive in Kandy, check into accommodation
-  - Afternoon: Visit Temple of the Tooth Relic
-  - Evening: Dinner at local restaurant
-
-Day 2: Botanical Gardens & Departure
-  - Morning: Explore Royal Botanical Gardens
-  - Afternoon: Shopping for souvenirs
-  - Evening: Depart from Kandy
-
-COST ESTIMATE:
-
-Accommodation: LKR 6,000 (2 nights × LKR 3,000)
-Food: LKR 4,000 (2 days × LKR 2,000)
-Transport: LKR 2,500 (tuk-tuk rides + local transport)
-Activities: LKR 1,500 (garden entrance fee)
-Total Cost: LKR 14,000
-
-================================================
-✅ PLAN VALIDATION PASSED
-
-Budget Check:
-  - Total Cost: LKR 14,000
-  - Budget: LKR 15,000
-  - Status: Within budget (LKR 1,000 remaining)
 ```
 
