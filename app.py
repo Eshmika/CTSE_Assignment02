@@ -34,7 +34,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title
-st.title("✈️ AI Travel Planner")
+st.title("🌿 EcoTour AI: Intelligent Travel Planner")
 st.markdown("### Generate personalized travel itineraries powered by Multi-Agent AI")
 
 # Sidebar for inputs
@@ -264,6 +264,6 @@ with st.sidebar:
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: gray;'>
-    <small>AI Travel Planner v1.0 | Powered by Multi-Agent System | © 2025</small>
+    <small>AI Travel Planner v1.0 | Powered by Multi-Agent System | © 2026</small>
 </div>
 """, unsafe_allow_html=True)
